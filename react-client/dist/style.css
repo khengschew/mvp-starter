@@ -1,0 +1,17 @@
+.board {
+  position: relative;
+  background-color: rgb(29, 154, 213);
+  width: 800px;
+  height: 800px;
+}
+
+.ship {
+  position: absolute;
+  background-image: url("ship.png");
+  width: 66px;
+  height: 113px;
+  /* Will need to change to different starting points */
+  /* top: calc(50% - 56px); */
+  /* left: calc(50% - 33px); */
+  /* transform: rotate(-45deg); */
+}
