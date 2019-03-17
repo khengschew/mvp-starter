@@ -6,15 +6,16 @@
   border: 1px solid red;
 }
 
-.ship {
+.ship, .decoy {
   position: absolute;
   background-image: url("ship.png");
-  width: 66px;
-  height: 113px;
-  /* Will need to change to different starting points */
-  /* top: calc(50% - 56px); */
-  /* left: calc(50% - 33px); */
-  /* transform: rotate(-45deg); */
+  background-size: contain;
+  width: 16px;
+  height: 28px;
   border: 1px solid red;
   transition: transform 0.1s;
+}
+
+.decoy {
+  background-image: url("decoy.png");
 }

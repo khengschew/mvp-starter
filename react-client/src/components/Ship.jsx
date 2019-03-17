@@ -7,11 +7,11 @@ class Ship extends React.Component {
 
     this.state = {
       player: props.player,
-      speed: 10,
+      speed: 1,
       currSpeed: 0,
-      maxSpeed: 30,
-      turnSpeed: 10,
-      fireRate: 10,
+      maxSpeed: 10, // user setting
+      turnSpeed: 10, // user setting
+      fireRate: 10, // user setting
       direction: props.direction,
       top: props.top,
       left: props.left,
@@ -22,7 +22,7 @@ class Ship extends React.Component {
       keys: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'],
     };
 
-    this.move = _.debounce(this.move, 10, {leading: true}).bind(this);
+    this.move = _.debounce(this.move, 30, {leading: true}).bind(this);
     this.momentum = this.momentum.bind(this);
   }
 
@@ -51,12 +51,12 @@ class Ship extends React.Component {
   momentum() {
     var newState = {};
 
-    newState.top = (this.props.maxHeight + (this.state.top + (this.state.currSpeed * Math.cos(-(this.state.direction / 180) * Math.PI)))) % this.props.maxHeight;
-    newState.left = (this.props.maxWidth + (this.state.left + (this.state.currSpeed * Math.sin(-(this.state.direction / 180) * Math.PI)))) % this.props.maxWidth;
+    newState.top = (this.props.maxHeight + (this.state.top + ((this.state.currSpeed / 3) * Math.cos(-(this.state.direction / 180) * Math.PI)))) % this.props.maxHeight;
+    newState.left = (this.props.maxWidth + (this.state.left + ((this.state.currSpeed / 3) * Math.sin(-(this.state.direction / 180) * Math.PI)))) % this.props.maxWidth;
 
     this.setState(newState);
 
-    this.interval = setTimeout(() => this.momentum(), 10);
+    this.interval = setTimeout(() => this.momentum(), 30);
   }
 
   move() {
@@ -65,10 +65,10 @@ class Ship extends React.Component {
     var newState = {};
 
     if (ArrowUp) {
-      newState.currSpeed = Math.min(((this.state.currSpeed * 10) + this.state.speed) / 10, this.state.maxSpeed);
+      newState.currSpeed = Math.min(this.state.currSpeed + this.state.speed, this.state.maxSpeed);
     }
     if (ArrowDown) {
-      newState.currSpeed = Math.max(((this.state.currSpeed * 10) - this.state.speed) / 10, 0);
+      newState.currSpeed = Math.max(this.state.currSpeed - this.state.speed, 0);
     }
     if (ArrowLeft) {
       newState.direction = this.state.direction - this.state.turnSpeed;
