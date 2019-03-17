@@ -3,6 +3,7 @@
   background-color: rgb(29, 154, 213);
   width: 800px;
   height: 800px;
+  border: 1px solid red;
 }
 
 .ship {
@@ -14,4 +15,6 @@
   /* top: calc(50% - 56px); */
   /* left: calc(50% - 33px); */
   /* transform: rotate(-45deg); */
+  border: 1px solid red;
+  transition: transform 0.1s;
 }
