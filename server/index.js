@@ -41,15 +41,7 @@ io.on('connection', client => {
     // If not, return object with base defaults
     // var zeroed = data.id - 1;
 
-    // game.ships.push({
-    //   top: Math.floor(zeroed / 2) < 1 ? 0 : 770,
-    //   left: zeroed % 2 === 1 ? 775 : 0,
-    //   direction: Math.floor(zeroed / 2) < 1 ? 0 : 180,
-    //   id: data.id,
-    //   isAlive: true,
-    // });
-
-    game.ships.push(new Ship(data.id, 7, 7, 6));
+    game.ships.push(new Ship(data.id, 5, 10, 5));
 
     newPlayer['ships'] = game.ships;
 

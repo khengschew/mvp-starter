@@ -66,6 +66,7 @@ class App extends React.Component {
       });
 
       // Handler for onUpdate emits from server
+      // socket.on('onUpdate', data => console.log(data));
       socket.on('onUpdate', data => this.setState(data));
     });
   }

@@ -12,7 +12,7 @@ const Ship = function(id, maxSpeed, turnSpeed, fireRate) {
   this.turnSpeed = turnSpeed;
   this.fireRate = fireRate;
   this.top = Math.floor(zeroed / 2) < 1 ? 0 : 770;
-  this.left = zeroed % 2 === 1 ? 775 : 0;
+  this.left = zeroed % 2 === 1 ? 770 : 0;
   this.direction = Math.floor(zeroed / 2) < 1 ? 0 : 180;
   this.isAlive = true;
   this.ArrowUp = 0;

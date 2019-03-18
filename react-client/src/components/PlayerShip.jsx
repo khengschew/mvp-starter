@@ -7,7 +7,7 @@ const PlayerShip = (props) => (
         style={
           {
             top: props.top + 'px',
-            left:props.left + 'px',
+            left: props.left + 'px',
             transform: `rotate(${props.direction}deg)`,
             backgroundImage: `url("ship${props.id}${props.isAlive ? '' : 'dead'}.png")`,
           }
