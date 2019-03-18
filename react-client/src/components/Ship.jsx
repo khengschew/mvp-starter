@@ -35,7 +35,7 @@ class Ship extends React.Component {
       if (this.state.keys.includes(key)) {
         var newState = {};
         newState[key] = 1;
-        this.props.socket.emit('key', { action: 'keydown', key });
+        this.props.socket.emit('key', { action: 'keydown', id: this.state.id, key });
         this.setState(newState, () => this.move());
       }
     });

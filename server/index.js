@@ -1,9 +1,9 @@
 var express = require('express');
 var http = require('http');
 var socketio = require('socket.io');
-var bodyParser = require('body-parser');
-var game = require('./gameLogic');
+var { Game } = require('./gameLogic');
 var players = require('../database-mongo');
+var { Ship } = require('./Ship');
 
 // Game Settings
 const settings = {
@@ -17,11 +17,9 @@ var io = socketio(server);
 
 app.use(express.static(__dirname + '/../react-client/dist'));
 
-// Socket logic is simple:
-// Player generates key presses
-// Server receives key press information
-// Server stores key press information until next tick
-// Server broadcasts updated data to all players
+// Initialize game
+var game = new Game(io);
+
 io.on('connection', client => {
   console.log('client connected');
 
@@ -41,18 +39,22 @@ io.on('connection', client => {
     // Check database to see if player exists
     // If player exists, retrieve data from database and return
     // If not, return object with base defaults
-    var zeroed = data.id - 1;
+    // var zeroed = data.id - 1;
 
-    game.ships.push({
-      top: Math.floor(zeroed / 2) < 1 ? 0 : 770,
-      left: zeroed % 2 === 1 ? 775 : 0,
-      direction: Math.floor(zeroed / 2) < 1 ? 0 : 180,
-      id: data.id
-    });
+    // game.ships.push({
+    //   top: Math.floor(zeroed / 2) < 1 ? 0 : 770,
+    //   left: zeroed % 2 === 1 ? 775 : 0,
+    //   direction: Math.floor(zeroed / 2) < 1 ? 0 : 180,
+    //   id: data.id,
+    //   isAlive: true,
+    // });
+
+    game.ships.push(new Ship(data.id, 7, 7, 6));
+
     newPlayer['ships'] = game.ships;
 
-    callback(newPlayer);
     client.broadcast.emit('onUpdate', { ships: game.ships });
+    callback(newPlayer);
   });
 
   client.on('watcher', (callback) => {
@@ -60,7 +62,11 @@ io.on('connection', client => {
   });
 
   client.on('key', data => {
-    console.log(`${data.action}: ${data.key}`);
+    var currShip = game.ships.filter((value) => {
+      return value.id === data.id;
+    })[0];
+
+    currShip.onKey(data.action, data.key);
   });
 
   client.on('disconnect', () => {
