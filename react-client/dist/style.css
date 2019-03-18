@@ -8,7 +8,6 @@
 
 .ship, .decoy {
   position: absolute;
-  background-image: url("ship.png");
   background-size: contain;
   width: 16px;
   height: 28px;
