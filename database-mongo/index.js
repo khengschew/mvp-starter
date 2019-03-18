@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');
+mongoose.connect('mongodb://localhost/seas');
 
 var db = mongoose.connection;
 
@@ -11,21 +11,33 @@ db.once('open', function() {
   console.log('mongoose connected successfully');
 });
 
-var itemSchema = mongoose.Schema({
-  quantity: Number,
-  description: String
+var playerSchema = mongoose.Schema({
+  name: String,
+  maxSpeed: Number,
+  turnSpeed: Number,
+  fireRate: Number,
 });
 
-var Item = mongoose.model('Item', itemSchema);
+var Player = mongoose.model('Player', playerSchema);
 
 var selectAll = function(callback) {
-  Item.find({}, function(err, items) {
+  Player.find({}, function(err, players) {
     if(err) {
       callback(err, null);
     } else {
-      callback(null, items);
+      callback(null, players);
     }
   });
 };
 
-module.exports.selectAll = selectAll;
+var findOne = function(name, callback) {
+  Player.find({ name: name }, function(err, player) {
+    if (err) {
+      callback(err, null);
+    } else {
+      callback(null, player);
+    }
+  });
+};
+
+module.exports = { selectAll, findOne };

@@ -8,8 +8,12 @@ class App extends React.Component {
 
     this.state = {
       player: null,
+      playerId: null,
       socket: io(),
+      ships: [],
     };
+
+    this.setPlayerData = this.setPlayerData.bind.this();
   }
 
   componentDidMount() {
@@ -17,21 +21,35 @@ class App extends React.Component {
 
     socket.on('connect', () => {
       socket.emit('checkPlayers', data => {
-        console.log(data);
         var playerName = '';
+        var playerId = null;
+
         if (data !== false) {
-          playerName = prompt('Please enter your name to play the game', `Player${parseInt(data) + 1}`);
-        } 
-        this.setState({ player: playerName }, () => this.state.player !== '' ? socket.emit('newPlayer', this.state.player) : '');
+          playerId = parseInt(data) + 1;
+          playerName = prompt('Please enter your name to play the game', `Player${playerId}`);
+        }
+
+        if (playerName !== '') {
+          // Retrieve player data from server
+          // Set state with player data
+          this.setState({ player: playerName, playerId: playerId }, this.setPlayerData);
+        } else {
+          this.setState({ player: playerName });
+        }
+
       });
     });
   }
 
+  setPlayerData() {
+    this.state.player !== '' ? socket.emit('newPlayer', this.state.player) : '';
+  }
+
   render() {
-    const { player, socket } = this.state;
+    const { player, socket, ships } = this.state;
 
     return (<div>
-      {player === null ? '' : <Board socket={socket} />}
+      {player === null ? '' : <Board socket={socket} ships={ships} />}
     </div>)
   }
 }

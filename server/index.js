@@ -3,10 +3,7 @@ var http = require('http');
 var socketio = require('socket.io');
 var bodyParser = require('body-parser');
 var game = require('./gameLogic');
-
-// UNCOMMENT THE DATABASE YOU'D LIKE TO USE
-// var items = require('../database-mysql');
-// var items = require('../database-mongo');
+var players = require('../database-mongo');
 
 // Game Settings
 const settings = {
@@ -35,6 +32,9 @@ io.on('connection', client => {
 
   client.on('newPlayer', data => {
     game.players.push(data);
+    // Check database to see if player exists
+    // If player exists, retrieve data from database and return
+    // If not, return object with base defaults
   });
 
   client.on('key', data => {
@@ -42,10 +42,10 @@ io.on('connection', client => {
   });
 
   client.on('disconnect', () => {
-    // Call from server component will unmount?
-    // Need to send the player name that disconnected so can remove from server
     console.log('disconnecting client');
   });
+
+  game.onUpdate();
 });
 
 server.listen(3000, function() {
