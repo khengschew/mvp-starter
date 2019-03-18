@@ -6,7 +6,7 @@ class Ship extends React.Component {
     super(props);
 
     this.state = {
-      player: props.player,
+      id: props.id,
       speed: 1,
       currSpeed: 0,
       maxSpeed: 10, // user setting
@@ -94,13 +94,12 @@ class Ship extends React.Component {
     return (
       <div
         className="ship"
-        data-player="1"
         style={
           {
             top: this.state.top + 'px',
             left:this.state.left + 'px',
             transform: `rotate(${this.state.direction}deg)`,
-            backgroundImage: `url("ship1.png")`,
+            backgroundImage: `url("ship${this.state.id}.png")`,
           }
         }
       >

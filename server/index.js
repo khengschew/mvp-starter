@@ -30,11 +30,33 @@ io.on('connection', client => {
     callback(eligible);
   });
 
-  client.on('newPlayer', data => {
-    game.players.push(data);
+  client.on('newPlayer', (data, callback) => {
+    var newPlayer = {
+      name: data.name,
+      id: data.id,
+    };
+
+    game.players.push(newPlayer);
+
     // Check database to see if player exists
     // If player exists, retrieve data from database and return
     // If not, return object with base defaults
+    var zeroed = data.id - 1;
+
+    game.ships.push({
+      top: Math.floor(zeroed / 2) < 1 ? 0 : 770,
+      left: zeroed % 2 === 1 ? 775 : 0,
+      direction: Math.floor(zeroed / 2) < 1 ? 0 : 180,
+      id: data.id
+    });
+    newPlayer['ships'] = game.ships;
+
+    callback(newPlayer);
+    client.broadcast.emit('onUpdate', { ships: game.ships });
+  });
+
+  client.on('watcher', (callback) => {
+    callback(game.ships);
   });
 
   client.on('key', data => {

@@ -13,7 +13,7 @@ class App extends React.Component {
       ships: [],
     };
 
-    this.setPlayerData = this.setPlayerData.bind.this();
+    this.onUpdate = this.onUpdate.bind(this);
   }
 
   componentDidMount() {
@@ -32,17 +32,23 @@ class App extends React.Component {
         if (playerName !== '') {
           // Retrieve player data from server
           // Set state with player data
-          this.setState({ player: playerName, playerId: playerId }, this.setPlayerData);
+          socket.emit('newPlayer', { name: playerName, id: playerId }, (playerObj) => {
+            // Set state using data
+            this.setState({ player: playerObj.name, playerId: playerObj.id, ships: playerObj.ships });
+          });
         } else {
-          this.setState({ player: playerName });
+          socket.emit('watcher', data => {
+            this.setState({ player: playerName, ships: data });
+          });
         }
-
       });
+
+      socket.on('onUpdate', this.onUpdate);
     });
   }
 
-  setPlayerData() {
-    this.state.player !== '' ? socket.emit('newPlayer', this.state.player) : '';
+  onUpdate(data) {
+    this.setState(data);
   }
 
   render() {
