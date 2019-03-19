@@ -45,11 +45,13 @@ Game.prototype.onUpdate = function() {
   // Check hits
   this.checkHit();
 
-  // Check winner
-  // this.checkWinner();
   
   // Send the position of all ships and projectiles
-  this.io.emit('onUpdate', { winner: this.winner, ships: this.ships, projectiles: this.projectiles });
+  this.io.emit('onUpdate', { ships: this.ships, projectiles: this.projectiles });
+
+  // Check winner
+  this.checkWinner();
+
   if (this.winner === null) setTimeout(this.onUpdate.bind(this), 30);
 };
 
@@ -94,25 +96,21 @@ Game.prototype.checkHit = function() {
   }
 };
 
-Game.prototype.checkRange = function() {
-  // Checks whether a projectile is out of range and whether to remove it
-};
-
 Game.prototype.checkWinner = function() {
   // Checks whether game is over and there is a winner
-  // If winner: 
-    // Reset game, disconnect all sockets?
-    // Send an alert to all players with winner name (players need to refresh to replay)
-  var stillAlive = [];
-  for (var ship of this.ships) {
-    if (ship.isAlive) stillAlive.push(ship);
-  }
+  if (this.players.length > 1) { 
+    var stillAlive = [];
+    for (var ship of this.ships) {
+      if (ship.isAlive) stillAlive.push(ship);
+    }
 
-  if (stillAlive.length <= 0) {
-    this.winner = 'draw';
-  }
-  if (stillAlive.length === 1) {
-    this.winner = this.players.filter(player => id === stillAlive[0].id).name;
+    if (stillAlive.length <= 0) {
+      this.winner = 'draw';
+    }
+    if (stillAlive.length === 1) {
+      this.winner = this.players.filter(player => player.id === stillAlive[0].id)[0].name;
+      this.io.emit('winner', this.winner);
+    }
   }
 };
 

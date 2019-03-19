@@ -31,7 +31,6 @@ class Ship extends React.Component {
   componentDidMount() {
     document.getElementsByTagName('body')[0].addEventListener('keydown', (e) => {
       var key = e.key === ' ' ? 'SpaceBar' : e.key;
-      console.log(`Keydown: ${key}`);
       if (this.state.keys.includes(key)) {
         var newState = {};
         newState[key] = 1;
@@ -42,7 +41,6 @@ class Ship extends React.Component {
 
     document.getElementsByTagName('body')[0].addEventListener('keyup', (e) => {
       var key = e.key === ' ' ? 'SpaceBar' : e.key;
-      console.log(`Keyup: ${key}`);
       if (this.state.keys.includes(key)) {
         var newState = {};
         newState[key] = 0;
@@ -87,7 +85,6 @@ class Ship extends React.Component {
     }
 
     this.setState(newState);
-
   }
 
   render() {

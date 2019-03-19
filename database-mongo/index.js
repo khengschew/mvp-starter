@@ -20,16 +20,6 @@ var playerSchema = mongoose.Schema({
 
 var Player = mongoose.model('Player', playerSchema);
 
-var selectAll = function(callback) {
-  Player.find({}, function(err, players) {
-    if(err) {
-      callback(err, null);
-    } else {
-      callback(null, players);
-    }
-  });
-};
-
 var findOne = function(name, callback) {
   Player.find({ name: name }, function(err, player) {
     if (err) {
@@ -40,4 +30,14 @@ var findOne = function(name, callback) {
   });
 };
 
-module.exports = { selectAll, findOne };
+var findAndUpdate = function(name, data, callback) {
+  Player.findOneAndUpdate({ name: name }, data, {upsert: true}, function(err, data) {
+    if (err) {
+      callback(err, null);
+    } else {
+      callback(null, data);
+    }
+  });
+}
+
+module.exports = { findOne, findAndUpdate };

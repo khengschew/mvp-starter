@@ -1,6 +1,7 @@
 import React from 'react';
 import io from 'socket.io-client';
 import Board from './Board';
+import Settings from './Settings';
 
 class App extends React.Component {
   constructor(props) {
@@ -9,17 +10,19 @@ class App extends React.Component {
     this.state = {
       winner: null,
       player: null,
+      maxSpeed: 3,
+      turnSpeed: 9,
+      fireRate: 2,
       id: null,
       socket: io(),
       ships: [],
       projectiles: [],
-      // ArrowUp: 0,
-      // ArrowDown: 0,
-      // ArrowLeft: 0,
-      // ArrowRight: 0,
-      // SpaceBar: 0,
       keys: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'SpaceBar'],
     };
+
+    this.increaseStat = this.increaseStat.bind(this);
+    this.decreaseStat = this.decreaseStat.bind(this);
+    this.updateStats = this.updateStats.bind(this);
   }
 
   componentDidMount() {
@@ -41,7 +44,7 @@ class App extends React.Component {
         if (playerName !== '') {
           socket.emit('newPlayer', { name: playerName, id: id }, (playerObj) => {
             // Set state with player data (maxSpeed, turnSpeed, fireRate)
-            this.setState({ player: playerObj.name, id: playerObj.id, ships: playerObj.ships });
+            this.setState({ player: playerObj.name, id: playerObj.id, maxSpeed: playerObj.maxSpeed, turnSpeed: playerObj.turnSpeed, fireRate: playerObj.fireRate, ships: playerObj.ships });
           });
 
           // Add key press handlers
@@ -67,19 +70,41 @@ class App extends React.Component {
       });
 
       // Handler for onUpdate emits from server
-      // socket.on('onUpdate', data => console.log(data));
-      socket.on('onUpdate', data => this.setState(data, () => {
-        if (this.state.winner !== null) alert(`The winner is: ${data}`);
-      }));
+      socket.on('onUpdate', data => this.setState(data));
+
+      socket.on('winner', data => alert(`The winner is: ${data}`));
     });
+  }
+
+  increaseStat(e) {
+    const { maxSpeed, turnSpeed, fireRate } = this.state;
+    if (maxSpeed + turnSpeed + fireRate < 15 && this.state[e.target.name] < 10) {
+      var newState = {};
+      newState[e.target.name] = this.state[e.target.name] + 1;
+      this.setState(newState);
+    }
+  }
+
+  decreaseStat(e) {
+    if (this.state[e.target.name] > 1) {
+      var newState = {};
+      newState[e.target.name] = this.state[e.target.name] - 1;
+      this.setState(newState);
+    }
+  }
+
+  updateStats() {
+    const { id, player, maxSpeed, turnSpeed, fireRate } = this.state;
+    this.state.socket.emit('updateStats', { id: id, name: player, maxSpeed, turnSpeed, fireRate });
   }
 
   render() {
     const { player, socket, ships, projectiles } = this.state;
 
     return (
-      <div>
+      <div className="game">
         {player === null ? '' : <Board socket={socket} ships={ships} projectiles={projectiles} />}
+        {player === null ? '' : <Settings maxSpeed={this.state.maxSpeed} turnSpeed={this.state.turnSpeed} fireRate={this.state.fireRate} increaseStat={this.increaseStat} decreaseStat={this.decreaseStat} updateStats={this.updateStats} />}
       </div>
     );
   }

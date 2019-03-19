@@ -2,7 +2,7 @@ var express = require('express');
 var http = require('http');
 var socketio = require('socket.io');
 var { Game } = require('./gameLogic');
-var players = require('../database-mongo');
+var db = require('../database-mongo');
 var { Ship } = require('./Ship');
 
 // Game Settings
@@ -37,16 +37,38 @@ io.on('connection', client => {
     game.players.push(newPlayer);
 
     // Check database to see if player exists
-    // If player exists, retrieve data from database and return
-    // If not, return object with base defaults
-    // var zeroed = data.id - 1;
+    var dbResults = {};
+    db.findOne(newPlayer.name, (err, player) => {
+      dbResults = player[0];
 
-    game.ships.push(new Ship(data.id, 5, 10, 5));
+      if (Object.keys(dbResults).length > 1) {
+        game.ships.push(new Ship(data.id, dbResults.maxSpeed, dbResults.turnSpeed, dbResults.fireRate));
 
-    newPlayer['ships'] = game.ships;
+        newPlayer.maxSpeed = dbResults.maxSpeed;
+        newPlayer.turnSpeed = dbResults.turnSpeed;
+        newPlayer.fireRate = dbResults.fireRate;
 
-    client.broadcast.emit('onUpdate', { ships: game.ships });
-    callback(newPlayer);
+      } else {
+        game.ships.push(new Ship(data.id, 3, 10, 2));
+      }
+  
+      newPlayer['ships'] = game.ships;
+  
+      client.broadcast.emit('onUpdate', { ships: game.ships });
+      callback(newPlayer);
+    });
+
+  });
+
+  client.on('updateStats', (data) => {
+    if (data.id !== null) {
+      var currShip = game.ships.filter(ship => ship.id === data.id)[0];
+
+      // Save to database
+      db.findAndUpdate(data.name, { name: data.name, maxSpeed: data.maxSpeed, turnSpeed: data.turnSpeed, fireRate: data.fireRate }, (err, data) => {
+        currShip.updateStats(data.maxSpeed, data.turnSpeed, data.fireRate);
+      });
+    }
   });
 
   client.on('watcher', (callback) => {
@@ -55,6 +77,14 @@ io.on('connection', client => {
 
   client.on('key', data => {
     game.onKey(data);
+  });
+
+  client.on('reset', () => {
+    game.ships = [];
+    game.projectiles = [];
+    for (var player of game.players) {
+      game.ships.push(new Ship(player.id, 3, 10, 2));
+    }
   });
 
   client.on('disconnect', () => {

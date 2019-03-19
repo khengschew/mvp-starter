@@ -34,12 +34,16 @@ Ship.prototype.getBox = function() {
   return { top: newTop, left: newLeft, width: newWidth, height: newHeight };
 };
 
+Ship.prototype.updateStats = function(maxSpeed, turnSpeed, fireRate) {
+  this.maxSpeed = maxSpeed;
+  this.turnSpeed = turnSpeed;
+  this.fireRate = fireRate;
+};
+
 Ship.prototype.onKey = function(action, key, projectiles) {
   if (action === 'keydown') {
-    // console.log(`${action}: ${key} for ship ${this.id}`);
     this[key] = 1;
   } else if (action === 'keyup') {
-    // console.log(`${action}: ${key} for ship ${this.id}`);
     this[key] = 0;
   }
 
