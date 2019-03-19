@@ -3,9 +3,9 @@
 const Projectile = function(shipTop, shipLeft, shipDirection) {
   this.top = shipTop + 14;
   this.left = shipLeft + 8;
-  this.speed = 2;
+  this.speed = 10;
   this.direction = shipDirection;
-  this.interval = 15;
+  this.interval = 10;
 };
 
 Projectile.prototype.momentum = function() {
