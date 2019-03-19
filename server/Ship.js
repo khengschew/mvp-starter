@@ -20,10 +20,18 @@ const Ship = function(id, maxSpeed, turnSpeed, fireRate) {
   this.ArrowLeft = 0;
   this.ArrowRight = 0;
   this.SpaceBar = 0;
+  this.height = 28;
+  this.width = 16;
 };
 
 Ship.prototype.getBox = function() {
+  // Returns array representing [top, left, width, height]
+  var newTop = this.top;
+  var newLeft = this.left;
+  var newWidth = this.width;
+  var newHeight = this.height;
 
+  return { top: newTop, left: newLeft, width: newWidth, height: newHeight };
 };
 
 Ship.prototype.onKey = function(action, key, projectiles) {
@@ -70,7 +78,7 @@ Ship.prototype.fire = function() {
     
     this.canFire = false;
     setTimeout(this.reload.bind(this), 10000 / this.fireRate);
-    return new Projectile(this.top, this.left, this.direction);
+    return new Projectile(this.id, this.top, this.left, this.direction);
   }
 };
 

@@ -69,7 +69,7 @@ class App extends React.Component {
       // Handler for onUpdate emits from server
       // socket.on('onUpdate', data => console.log(data));
       socket.on('onUpdate', data => this.setState(data, () => {
-        if (this.state.winner) alert(`The winner is: ${data}`);
+        if (this.state.winner !== null) alert(`The winner is: ${data}`);
       }));
     });
   }
