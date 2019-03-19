@@ -4,43 +4,50 @@
 // Determining if ships have collided
 // Determining if a ship has been hit
 // Determining if a game is over
-const { Ship } = require('./Ship');
 
 const Game = function(server) {
   this.players = [];
   this.ships = [];
   this.projectiles = [];
   this.io = server;
-  this.status = true;
+  this.winner = null;
 };
 
 Game.prototype.momentum = function(maxHeight, maxWidth) {
   // Helper function used to calculate the location of a ship or projectile
-  // Loop through all ships and recalc
-  // Check crashes
-  // Loop through all projectiles and recalc
-  // Check hits
-  // Set increment
 
   for (var ship of this.ships) {
     ship.momentum(maxHeight, maxWidth);
   }
+
+  // Loop through all projectiles and recalc
+  this.projectiles = this.projectiles.filter(projectile => projectile.interval > 0);
+  for (var projectile of this.projectiles) {
+    projectile.momentum();
+  }
+};
+
+Game.prototype.onKey = function(data) {
+  var currShip = this.ships.filter((value) => {
+    return value.id === data.id;
+  })[0];
+
+  currShip.onKey(data.action, data.key, this.projectiles);
 };
 
 Game.prototype.onUpdate = function() {
   // Send the position of all ships and projectiles
   this.momentum(775, 775);
-  this.io.emit('onUpdate', { ships: this.ships, projectiles: this.projectiles });
-  if (this.status) setTimeout(this.onUpdate.bind(this), 30);
+  // Check crashes
+  // Check hits
+  // Check winner
+
+  this.io.emit('onUpdate', { winner: this.winner, ships: this.ships, projectiles: this.projectiles });
+  if (this.winner === null) setTimeout(this.onUpdate.bind(this), 30);
 };
 
 Game.prototype.checkCrash = function() {
   // Checks whether two ships have crash into each other
-};
-
-Game.prototype.fire = function() {
-  // If outside of cooldown, creates projectile
-  // Else do nothing
 };
 
 Game.prototype.checkHit = function() {
@@ -56,6 +63,17 @@ Game.prototype.checkWinner = function() {
   // If winner: 
     // Reset game, disconnect all sockets?
     // Send an alert to all players with winner name (players need to refresh to replay)
+  var stillAlive = [];
+  for (var ship of ships) {
+    if (ship.isAlive) stillAlive.push(ship);
+  }
+
+  if (stillAlive.length <= 0) {
+    this.winner = 'draw';
+  }
+  if (stillAlive.length === 1) {
+    this.winner = this.players.filter(player => id === stillAlive[0].id).name;
+  }
 };
 
 module.exports = { Game };

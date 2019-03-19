@@ -7,16 +7,17 @@ class App extends React.Component {
     super(props);
 
     this.state = {
+      winner: null,
       player: null,
       id: null,
       socket: io(),
       ships: [],
       projectiles: [],
-      ArrowUp: 0,
-      ArrowDown: 0,
-      ArrowLeft: 0,
-      ArrowRight: 0,
-      SpaceBar: 0,
+      // ArrowUp: 0,
+      // ArrowDown: 0,
+      // ArrowLeft: 0,
+      // ArrowRight: 0,
+      // SpaceBar: 0,
       keys: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'SpaceBar'],
     };
   }
@@ -67,16 +68,20 @@ class App extends React.Component {
 
       // Handler for onUpdate emits from server
       // socket.on('onUpdate', data => console.log(data));
-      socket.on('onUpdate', data => this.setState(data));
+      socket.on('onUpdate', data => this.setState(data, () => {
+        if (this.state.winner) alert(`The winner is: ${data}`);
+      }));
     });
   }
 
   render() {
-    const { player, socket, ships } = this.state;
+    const { player, socket, ships, projectiles } = this.state;
 
-    return (<div>
-      {player === null ? '' : <Board socket={socket} ships={ships} />}
-    </div>)
+    return (
+      <div>
+        {player === null ? '' : <Board socket={socket} ships={ships} projectiles={projectiles} />}
+      </div>
+    );
   }
 }
 

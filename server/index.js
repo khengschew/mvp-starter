@@ -54,11 +54,7 @@ io.on('connection', client => {
   });
 
   client.on('key', data => {
-    var currShip = game.ships.filter((value) => {
-      return value.id === data.id;
-    })[0];
-
-    currShip.onKey(data.action, data.key);
+    game.onKey(data);
   });
 
   client.on('disconnect', () => {

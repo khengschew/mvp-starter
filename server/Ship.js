@@ -1,7 +1,6 @@
-// Class for ship
-// Should include methods like move, momentum, getPos, checkCrash, fire
-// Should include properties like top, left, direction, isAlive
+const { Projectile } = require('./Projectile');
 
+// Class for ship
 const Ship = function(id, maxSpeed, turnSpeed, fireRate) {
   var zeroed = id - 1;
 
@@ -14,16 +13,20 @@ const Ship = function(id, maxSpeed, turnSpeed, fireRate) {
   this.top = Math.floor(zeroed / 2) < 1 ? 0 : 770;
   this.left = zeroed % 2 === 1 ? 770 : 0;
   this.direction = Math.floor(zeroed / 2) < 1 ? 0 : 180;
+  this.canFire = true;
   this.isAlive = true;
   this.ArrowUp = 0;
   this.ArrowDown = 0;
   this.ArrowLeft = 0;
   this.ArrowRight = 0;
   this.SpaceBar = 0;
-  this.keys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'SpaceBar'];
 };
 
-Ship.prototype.onKey = function(action, key) {
+Ship.prototype.getBox = function() {
+
+};
+
+Ship.prototype.onKey = function(action, key, projectiles) {
   if (action === 'keydown') {
     // console.log(`${action}: ${key} for ship ${this.id}`);
     this[key] = 1;
@@ -32,36 +35,52 @@ Ship.prototype.onKey = function(action, key) {
     this[key] = 0;
   }
 
-  this.move();
-};
+  if (this.isAlive) {
+    var { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, SpaceBar } = this;
 
-Ship.prototype.move = function() {
-  var { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, SpaceBar } = this;
-
-  if (ArrowUp) {
-    this.currSpeed = Math.min(this.currSpeed + this.speed, this.maxSpeed);
-  }
-  if (ArrowDown) {
-    this.currSpeed = Math.max(this.currSpeed - this.speed, 0);
-  }
-  if (ArrowLeft) {
-    this.direction = this.direction - this.turnSpeed;
-  }
-  if (ArrowRight) {
-    this.direction = this.direction + this.turnSpeed;
-  }
-  if (SpaceBar) {
-    console.log('Fire!');
+    if (ArrowUp) {
+      this.currSpeed = Math.min(this.currSpeed + this.speed, this.maxSpeed);
+    }
+    if (ArrowDown) {
+      this.currSpeed = Math.max(this.currSpeed - this.speed, 0);
+    }
+    if (ArrowLeft) {
+      this.direction = this.direction - this.turnSpeed;
+    }
+    if (ArrowRight) {
+      this.direction = this.direction + this.turnSpeed;
+    }
+    if (SpaceBar) {
+      var fired = this.fire();
+      if (fired) projectiles.push(fired);
+    }
   }
 };
 
 Ship.prototype.momentum = function(maxHeight, maxWidth) {
-  this.top = (maxHeight + (this.top + ((this.currSpeed / 3) * Math.cos(-(this.direction / 180) * Math.PI)))) % maxHeight;
-  this.left = (maxWidth + (this.left + ((this.currSpeed / 3) * Math.sin(-(this.direction / 180) * Math.PI)))) % maxWidth;
+  if (this.isAlive) {
+    this.top = (maxHeight + (this.top + ((this.currSpeed / 3) * Math.cos(-(this.direction / 180) * Math.PI)))) % maxHeight;
+    this.left = (maxWidth + (this.left + ((this.currSpeed / 3) * Math.sin(-(this.direction / 180) * Math.PI)))) % maxWidth;
+  }
 };
 
 Ship.prototype.fire = function() {
+  if (this.canFire) {
+    console.log('Fire!');
+    
+    this.canFire = false;
+    setTimeout(this.reload.bind(this), 10000 / this.fireRate);
+    return new Projectile(this.top, this.left, this.direction);
+  }
+};
 
+Ship.prototype.reload = function() {
+  console.log('Reloaded!');
+  this.canFire = true;
+};
+
+Ship.prototype.dead = function() {
+  this.isAlive = false;
 };
 
 module.exports = { Ship };
